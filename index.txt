@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>orech.pl - Hosting Minecraft</title>
+<style>
+body { font-family:"Trebuchet MS", sans-serif; background:linear-gradient(#9cd3ff,#91e56c); text-align:center; margin:0; padding:0; }
+h1 { margin:25px 0; font-size:46px; color:#2e4600; text-shadow:2px 2px 6px rgba(0,0,0,0.3); }
+.plans { display:flex; justify-content:center; align-items:stretch; gap:40px; margin-top:50px; flex-wrap:wrap; }
+.plan { width:320px; background:#fff; border-radius:20px; box-shadow:0 8px 14px rgba(0,0,0,0.3); cursor:pointer; transition:transform 0.25s, box-shadow 0.25s; overflow:hidden; }
+.plan:hover { transform:scale(1.07); box-shadow:0 12px 18px rgba(0,0,0,0.5); }
+.plan img { width:100%; height:180px; object-fit:cover; border-bottom:3px solid rgba(0,0,0,0.2); }
+.plan h2 { margin:15px 0 5px 0; font-size:26px; color:#2e4600; }
+.plan p { margin-bottom:20px; font-size:19px; color:#333; }
+.dirt { background: linear-gradient(#c29b68,#a26f3d); }
+.stone { background: linear-gradient(#a8a8a8,#7a7a7a); }
+.diamond { background: linear-gradient(#57e0ff,#39a0d1); }
+footer { margin-top:60px; font-size:14px; color:#444; }
+</style>
+</head>
+<body>
+<h1>orech.pl – Hosting Minecraft</h1>
+<div class="plans">
+  <div class="plan dirt">
+    <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/3/3f/Dirt_JE4_BE2.png" alt="Dirt">
+    <h2>Plan 0 zł</h2>
+    <p>Hosting próbny – blok z ziemi 🌱</p>
+  </div>
+  <div class="plan stone">
+    <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/9/9f/Gold_Block_JE2_BE2.png" alt="Gold Block">
+    <h2>Plan 5 zł</h2>
+    <p>Podstawowy pakiet – złoty standard 💰</p>
+  </div>
+  <div class="plan diamond">
+    <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/f1/Diamond_Block_JE3_BE3.png" alt="Diamond Block">
+    <h2>Plan 10 zł</h2>
+    <p>Premium serwer – diamentowa jakość 💎</p>
+  </div>
+</div>
+<footer>© orech.pl</footer>
+
+<script>
+let pijWojankaPlayed = false; // MP3 odtwarzane tylko raz
+let windows = [];
+
+function createDuckWindow() {
+  const width = 480;
+  const height = 270;
+  let left = Math.floor(Math.random() * (window.screen.width - width));
+  let top = Math.floor(Math.random() * (window.screen.height - height));
+  let dx = Math.random() < 0.5 ? 4 : -4;
+  let dy = Math.random() < 0.5 ? 4 : -4;
+
+  // Otwarcie okna w reakcji na kliknięcie – autoplay z dźwiękiem dozwolone
+  const win = window.open("", "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+  if (!win) return;
+  windows.push(win);
+
+  // Wstawiamy MP4 z kaczkami startujące natychmiast z dźwiękiem
+  win.document.write(`<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Kaczka</title>
+<style>
+body { margin:0; background:black; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
+video { max-width:100%; max-height:100%; pointer-events:none; }
+</style>
+</head>
+<body>
+<video id="myVideo" src="duck90s.mp4" autoplay loop preload="auto"></video>
+<script>
+const v = document.getElementById('myVideo');
+v.volume = 1.0;
+v.muted = false;
+v.play(); // odtwarzanie natychmiast z dźwiękiem
+setInterval(() => { if(v.paused) v.play(); }, 500);
+<\/script>
+</body>
+</html>`);
+
+  // Animacja ruchu okna
+  function move() {
+    if (!win || win.closed) return;
+    left += dx;
+    top += dy;
+    if (left <= 0 || left + width >= window.screen.width) dx = -dx;
+    if (top <= 0 || top + height >= window.screen.height) dy = -dy;
+    win.moveTo(left, top);
+    requestAnimationFrame(move);
+  }
+  move();
+}
+
+// Obsługa kliknięcia w plansze
+document.querySelectorAll('.plan').forEach(plan => {
+  plan.addEventListener('click', () => {
+    createDuckWindow(); // każde kliknięcie otwiera nową kaczkę z dźwiękiem
+
+    // MP3 pij_wojanka tylko raz, 5 sekund po pierwszym kliknięciu
+    if (!pijWojankaPlayed) {
+      pijWojankaPlayed = true;
+      setTimeout(() => {
+        const audio = new Audio('pij_wojanka.mp3');
+        audio.volume = 1.0;
+        audio.play().catch(() => {
+          document.body.addEventListener('click', () => audio.play(), { once: true });
+        });
+      }, 5000);
+    }
+  });
+});
+</script>
+</body>
+</html>
