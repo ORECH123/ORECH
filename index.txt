@@ -40,10 +40,9 @@ footer { margin-top:60px; font-size:14px; color:#444; }
 <footer>© orech.pl</footer>
 
 <script>
-let pijWojankaPlayed = false; // MP3 odtwarzane tylko raz
-let windows = [];
+let pijWojankaPlayed = false;
 
-function createDuckWindow() {
+function openDuckWindow() {
   const width = 480;
   const height = 270;
   let left = Math.floor(Math.random() * (window.screen.width - width));
@@ -51,37 +50,13 @@ function createDuckWindow() {
   let dx = Math.random() < 0.5 ? 4 : -4;
   let dy = Math.random() < 0.5 ? 4 : -4;
 
-  // Otwarcie okna w reakcji na kliknięcie – autoplay z dźwiękiem dozwolone
-  const win = window.open("", "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+  // otwieramy prawdziwe nowe okno
+  const win = window.open("duck.html", "_blank", `width=${width},height=${height},left=${left},top=${top}`);
   if (!win) return;
-  windows.push(win);
 
-  // Wstawiamy MP4 z kaczkami startujące natychmiast z dźwiękiem
-  win.document.write(`<!DOCTYPE html>
-<html lang="pl">
-<head>
-<meta charset="UTF-8">
-<title>Kaczka</title>
-<style>
-body { margin:0; background:black; display:flex; justify-content:center; align-items:center; height:100vh; overflow:hidden; }
-video { max-width:100%; max-height:100%; pointer-events:none; }
-</style>
-</head>
-<body>
-<video id="myVideo" src="duck90s.mp4" autoplay loop preload="auto"></video>
-<script>
-const v = document.getElementById('myVideo');
-v.volume = 1.0;
-v.muted = false;
-v.play(); // odtwarzanie natychmiast z dźwiękiem
-setInterval(() => { if(v.paused) v.play(); }, 500);
-<\/script>
-</body>
-</html>`);
-
-  // Animacja ruchu okna
+  // animacja "latającego" okna
   function move() {
-    if (!win || win.closed) return;
+    if (win.closed) return;
     left += dx;
     top += dy;
     if (left <= 0 || left + width >= window.screen.width) dx = -dx;
@@ -92,12 +67,10 @@ setInterval(() => { if(v.paused) v.play(); }, 500);
   move();
 }
 
-// Obsługa kliknięcia w plansze
 document.querySelectorAll('.plan').forEach(plan => {
   plan.addEventListener('click', () => {
-    createDuckWindow(); // każde kliknięcie otwiera nową kaczkę z dźwiękiem
+    openDuckWindow();
 
-    // MP3 pij_wojanka tylko raz, 5 sekund po pierwszym kliknięciu
     if (!pijWojankaPlayed) {
       pijWojankaPlayed = true;
       setTimeout(() => {
